@@ -1,8 +1,8 @@
 import pandas as pd
 import time
 import numpy as np
-from sklearn import svm, ensemble
-from sklearn.model_selection import KFold, cross_val_score, LeaveOneOut, RandomizedSearchCV
+from sklearn import svm, ensemble, linear_model
+from sklearn.model_selection import KFold, cross_val_score
 from sklearn.metrics import accuracy_score
 from sklearn.neural_network import MLPClassifier
 
@@ -21,10 +21,13 @@ X_test = np.delete(X_test, 0, axis=1)
 Y_test = np.delete(Y_test, 0, axis=1).flatten()
 
 # define the models
+sgd_clf = linear_model.SGDClassifier(alpha=0.0001, penalty='elasticnet', max_iter=100, random_state=100)
 svm_linear_kernel_clf = svm.SVC(kernel="linear", gamma=0.001, C=100., random_state=100)
-svm_rbf_kernel_clf = svm.SVC(kernel="rbf", gamma=0.001, C=100., random_state=100)
-rf_clf = ensemble.RandomForestClassifier(max_leaf_nodes=50, random_state=100)
-nn_clf = MLPClassifier(random_state=100)
+svm_polynomial_kernel_clf = svm.SVC(kernel='poly', gamma=0.001, C=100., random_state=100)
+svm_sigmoid_kernel_clf = svm.SVC(kernel="sigmoid", gamma=0.001, C=100., random_state=100)
+svm_rbf_kernel_clf = svm.SVC(kernel="rbf", gamma=0.001, C=100, random_state=100)
+rf_clf = ensemble.RandomForestClassifier(n_estimators=20, max_leaf_nodes=50, random_state=100)
+nn_clf = MLPClassifier(hidden_layer_sizes=200, solver="lbfgs",learning_rate="adaptive",random_state=100)
 
 
 # setup cross validation
@@ -34,8 +37,17 @@ def kfold_cross_val_score(model, X_train, Y_train, n_folds=10):
     return (-cross_val_score(model, X_train, Y_train, scoring="neg_mean_squared_error", cv=k_fold_shuttle)).mean()
 
 
+sgd_clf_score = kfold_cross_val_score(sgd_clf, X_train, Y_train)
+print("K fold sgd_clf score: {:5f}\n".format(sgd_clf_score.mean()))
+
 svm_linear_kernel_score = kfold_cross_val_score(svm_linear_kernel_clf, X_train, Y_train)
 print("K fold SVM linear kernel score: {:5f}\n".format(svm_linear_kernel_score.mean()))
+
+svm_polynomial_kernel_score = kfold_cross_val_score(svm_polynomial_kernel_clf, X_train, Y_train)
+print("K fold SVM polynomial kernel score: {:5f}\n".format(svm_polynomial_kernel_score.mean()))
+
+svm_sigmoid_kernel_score = kfold_cross_val_score(svm_sigmoid_kernel_clf, X_train, Y_train)
+print("K fold SVM sigmoid kernel score: {:5f}\n".format(svm_sigmoid_kernel_score.mean()))
 
 svm_rbf_kernel_score = kfold_cross_val_score(svm_rbf_kernel_clf, X_train, Y_train)
 print("K fold SVM rbf kernel score: {:5f}\n".format(svm_rbf_kernel_score.mean()))
@@ -47,6 +59,11 @@ nn_score = kfold_cross_val_score(nn_clf, X_train, Y_train)
 print("K fold Neural Network score: {:5f}\n\n".format(nn_score.mean()))
 
 # Fit the models
+t0 = time.time()
+sgd_clf = sgd_clf.fit(X_train, Y_train)
+t1 = time.time()
+print("sgd_clf took at %.2f seconds\n" % (t1 - t0))
+
 t0 = time.time()
 svm_linear_kernel_clf = svm_linear_kernel_clf.fit(X_train, Y_train)
 t1 = time.time()
@@ -68,17 +85,20 @@ t1 = time.time()
 print("Neural Network fitting took at %.2f seconds\n" % (t1 - t0))
 
 # make predictions
+sgd_clf_pred = sgd_clf.predict(X_test)
 svm_linear_kernel_pred = svm_linear_kernel_clf.predict(X_test)
 svm_rbf_kernel_pred = svm_rbf_kernel_clf.predict(X_test)
 rf_pred = rf_clf.predict(X_test)
 nn_pred = nn_clf.predict(X_test)
 
 # measure and output accuracy
+sgd_clf_score = accuracy_score(Y_test, sgd_clf_pred)
 svm_linear_kernel_score = accuracy_score(Y_test, svm_linear_kernel_pred)
 svm_rbf_kernel_score = accuracy_score(Y_test, svm_rbf_kernel_pred)
 rf_score = accuracy_score(Y_test, rf_pred)
 nn_score = accuracy_score(Y_test, nn_pred)
 
+print("SGD score: {:5f}\n".format(sgd_clf_score))
 print("SVM linear kernel accuracy score: {:5f}\n".format(svm_linear_kernel_score))
 print("SVM rbf kernel accuracy score: {:5f}\n".format(svm_rbf_kernel_score))
 print("Random Forest accuracy score: {:5f}\n".format(rf_score))
