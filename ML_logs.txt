@@ -1,0 +1,56 @@
+pydev debugger: process 69001 is connecting
+
+Traceback (most recent call last):
+  File "/Users/ziweiwu/Library/Application Support/JetBrains/Toolbox/apps/PyCharm-P/ch-0/181.5087.37/PyCharm.app/Contents/helpers/pydev/pydevd.py", line 1664, in <module>
+    main()
+  File "/Users/ziweiwu/Library/Application Support/JetBrains/Toolbox/apps/PyCharm-P/ch-0/181.5087.37/PyCharm.app/Contents/helpers/pydev/pydevd.py", line 1658, in main
+    globals = debugger.run(setup['file'], None, None, is_module)
+  File "/Users/ziweiwu/Library/Application Support/JetBrains/Toolbox/apps/PyCharm-P/ch-0/181.5087.37/PyCharm.app/Contents/helpers/pydev/pydevd.py", line 1068, in run
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Users/ziweiwu/Library/Application Support/JetBrains/Toolbox/apps/PyCharm-P/ch-0/181.5087.37/PyCharm.app/Contents/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/ziweiwu/research/projects/microarray-analysis/machineLearning.py", line 33, in <module>
+    sgd_clf = GridSearchCV(estimator=sgd_clf, param_grid=parameters).fit(X_train, Y_train)
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/model_selection/_search.py", line 945, in fit
+    return self._fit(X, y, groups, ParameterGrid(self.param_grid))
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/model_selection/_search.py", line 564, in _fit
+    for parameters in parameter_iterable
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 758, in __call__
+    while self.dispatch_one_batch(iterator):
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 608, in dispatch_one_batch
+    self._dispatch(tasks)
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 571, in _dispatch
+    job = self._backend.apply_async(batch, callback=cb)
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/externals/joblib/_parallel_backends.py", line 109, in apply_async
+    result = ImmediateResult(func)
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/externals/joblib/_parallel_backends.py", line 326, in __init__
+    self.results = batch()
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 131, in __call__
+    return [func(*args, **kwargs) for func, args, kwargs in self.items]
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 131, in <listcomp>
+    return [func(*args, **kwargs) for func, args, kwargs in self.items]
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/model_selection/_validation.py", line 238, in _fit_and_score
+    estimator.fit(X_train, y_train, **fit_params)
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/linear_model/stochastic_gradient.py", line 545, in fit
+    sample_weight=sample_weight)
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/linear_model/stochastic_gradient.py", line 415, in _fit
+    classes, sample_weight, coef_init, intercept_init)
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/linear_model/stochastic_gradient.py", line 373, in _partial_fit
+    sample_weight=sample_weight, n_iter=n_iter)
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/linear_model/stochastic_gradient.py", line 457, in _fit_multiclass
+    for i in range(len(self.classes_)))
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 768, in __call__
+    self.retrieve()
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 719, in retrieve
+    raise exception
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 682, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/multiprocessing/pool.py", line 602, in get
+    self.wait(timeout)
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/multiprocessing/pool.py", line 599, in wait
+    self._event.wait(timeout)
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/threading.py", line 546, in wait
+    signaled = self._cond.wait(timeout)
+  File "/Users/ziweiwu/miniconda3/envs/project-environment/lib/python3.4/threading.py", line 290, in wait
+    waiter.acquire()
+KeyboardInterrupt

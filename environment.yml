@@ -1,11 +1,37 @@
-name: project-environment
-
+name: ML-projects
+channels:
+  - defaults
 dependencies:
-  - python=3.4
-  - numpy
-  - toolz
-  - matplotlib
-  - pandas
-  - pip
-  - scikit-learn
-  - seaborn
+  - ca-certificates=2018.03.07=0
+  - cycler=0.10.0=py34_0
+  - freetype=2.5.5=2
+  - icu=54.1=0
+  - intel-openmp=2018.0.3=0
+  - libpng=1.6.34=he12f830_0
+  - matplotlib=2.0.0=np111py34_0
+  - mkl=2017.0.4=h1fae6ae_0
+  - numpy=1.11.3=py34_0
+  - openssl=1.0.2o=h26aff7b_0
+  - pandas=0.19.2=np111py34_1
+  - pip=9.0.1=py34_1
+  - pyparsing=2.2.0=py34_0
+  - pyqt=5.6.0=py34_2
+  - python=3.4.5=0
+  - python-dateutil=2.6.1=py34_0
+  - pytz=2017.2=py34_0
+  - qt=5.6.2=2
+  - readline=6.2=2
+  - scikit-learn=0.18.1=np111py34_1
+  - scipy=0.18.1=np111py34_1
+  - seaborn=0.7.1=py34_0
+  - setuptools=27.2.0=py34_0
+  - sip=4.18=py34_0
+  - six=1.10.0=py34_0
+  - sqlite=3.13.0=0
+  - tk=8.5.18=0
+  - toolz=0.8.2=py34_0
+  - wheel=0.29.0=py34_0
+  - xz=5.2.4=h1de35cc_4
+  - zlib=1.2.11=hf3cbc9b_2
+prefix: /Users/ziweiwu/anaconda3/envs/ML-projects
+
