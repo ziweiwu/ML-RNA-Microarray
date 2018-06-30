@@ -1,36 +1,34 @@
 import pandas as pd
-import time
 import numpy as np
 from sklearn import svm, ensemble, linear_model
 from sklearn.model_selection import KFold, cross_val_score
-from sklearn.metrics import accuracy_score
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import GridSearchCV
 
 # load the training data
 X_train = pd.read_csv("data/X_train.csv").values
 Y_train = pd.read_csv("data/Y_train.csv").values
-
 X_test = pd.read_csv("data/X_test.csv").values
 Y_test = pd.read_csv("data/Y_test.csv").values
-
 # transform panda df into arrays
 X_train = np.delete(X_train, 0, axis=1)
 Y_train = np.delete(Y_train, 0, axis=1).flatten()
-
 X_test = np.delete(X_test, 0, axis=1)
 Y_test = np.delete(Y_test, 0, axis=1).flatten()
 
+print(X_train.shape())
+print(Y_train.shape())
+
 # define the models
-sgd_clf = linear_model.SGDClassifier(random_state=100)
+sgd_clf = linear_model.SGDClassifier(random_state=100, n_jobs=-1)
 svm_clf = svm.SVC(random_state=100)
-rf_clf = ensemble.RandomForestClassifier(random_state=100)
+rf_clf = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1)
 nn_clf = MLPClassifier(random_state=100)
 
 # paremeter tuning for sgd, by default sgd fits a linear svm
 parameters = {
     'alpha': [0.0001, 0.5, 1, 5, 50, 100, 200, 500],
-    'penalty': ('l2', 'l1', 'elasticnet')
+    'penalty': ('l2', 'l1', 'elasticnet'),
 }
 sgd_clf = GridSearchCV(estimator=sgd_clf, param_grid=parameters).fit(X_train, Y_train)
 print("Best params for sgd:", sgd_clf.best_params_, '\n')
@@ -47,16 +45,16 @@ print("Best params for svm:", svm_clf.best_params_, '\n')
 # parameter tuning for random forest
 parameters = {
     'n_estimators': [10, 20, 50],
-    'max_leaf_nodes': [50, 100, 150,200]
+    'max_leaf_nodes': [50, 100, 150, 200]
 }
 rf_clf = GridSearchCV(estimator=rf_clf, param_grid=parameters).fit(X_train, Y_train)
 print("Best params for rf:", rf_clf.best_params_, '\n')
 
 # parameter tuning for neural network
 parameters = {
-    'hidden_layer_size': [50, 100, 150, 200],
+    'hidden_layer_sizes': [50, 100, 150, 200],
     'alpha': [0.0001, 0.0005, 0.001, 0.005],
-    'learning_rate': ('constant', 'adaptive', 'invscaling')
+    'activation': ('relu', 'tanh', 'identity'),
 }
 nn_clf = GridSearchCV(estimator=nn_clf, param_grid=parameters).fit(X_train, Y_train)
 print("Best params for nn:", rf_clf.best_params_, '\n')
@@ -68,17 +66,18 @@ def kfold_model_score(model, X_train, Y_train, numFolds=5):
     return np.mean(cross_val_score(model, X_train, Y_train, cv=k_fold_shuttle))
 
 
-sgd_clf_score = kfold_model_score(sgd_clf, X_train, Y_train)
-print("Linear svm score: {:5f}\n".format(sgd_clf_score.mean()))
+def compare_models(X_train, Y_train):
+    sgd_clf_score = kfold_model_score(sgd_clf, X_train, Y_train)
+    print("Linear svm score: {:5f}\n".format(sgd_clf_score.mean()))
+    svm_score = kfold_model_score(svm_clf, X_train, Y_train)
+    print("Non-linear svm score: {:5f}\n".format(svm_score.mean()))
+    rf_score = kfold_model_score(rf_clf, X_train, Y_train)
+    print("Random Forest score: {:5f}\n".format(rf_score.mean()))
+    nn_score = kfold_model_score(nn_clf, X_train, Y_train)
+    print("MPL Neural Network score: {:5f}\n\n".format(nn_score.mean()))
 
-svm_score = kfold_model_score(svm_clf, X_train, Y_train)
-print("Non-linear svm score: {:5f}\n".format(svm_score.mean()))
 
-rf_score = kfold_model_score(rf_clf, X_train, Y_train)
-print("Random Forest score: {:5f}\n".format(rf_score.mean()))
-
-nn_score = kfold_model_score(nn_clf, X_train, Y_train)
-print("MPL Neural Network score: {:5f}\n\n".format(nn_score.mean()))
+compare_models(X_train, Y_train)
 
 #
 #     # Fit the models
