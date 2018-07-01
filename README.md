@@ -1,13 +1,19 @@
 # Classifying Tumor from RNA Microarray using Machine Learning
 ## Setup the environment
 To set up the Python environment, install `mini-conda`  or `anaconda3`, then run in command line
-```bash import_env.sh```
+```
+bash import_env.sh
+```
 
 ## Getting Started 
 To perform data visualizationa nd split data into train and test sets, run in command line
-```python data_exploration.py```
+```
+python data_exploration.py
+```
 To perform machine learning model selection and evaluation, run in command line
-```python machine_learning.py``` 
+```
+python machine_learning.py
+``` 
 
 ## Helpful links 
 - [[https://cloud.google.com/ml-engine/docs/tensorflow/ml-solutions-overview][Google ML Tutorial]]
