@@ -93,7 +93,7 @@ t1 = time.time()
 print("sgd_clf training took %.2f seconds\n" % (t1 - t0))
 
 t0 = time.time()
-svm_clf = svm.fit(X_train, Y_train)
+svm_clf = svm_clf.fit(X_train, Y_train)
 t1 = time.time()
 print("SVM training took %.2f seconds\n" % (t1 - t0))
 
