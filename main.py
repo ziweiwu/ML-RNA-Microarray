@@ -1,2 +1,2 @@
-import importData
-import machineLearning
+import data_exploration
+import machine_learning

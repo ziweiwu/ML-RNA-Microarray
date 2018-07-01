@@ -1,17 +1,19 @@
+import time
+from __future__ import print_function
 import pandas as pd
 import numpy as np
-import time
-from sklearn.metrics.classification import accuracy_score, classification_report, jaccard_similarity_score, f1_score
+from sklearn.metrics.classification import classification_report, jaccard_similarity_score, f1_score
 from sklearn import svm, ensemble, linear_model
 from sklearn.model_selection import KFold, cross_val_score, GridSearchCV
 from sklearn.neural_network import MLPClassifier
 
 # load the training data
-print("Loading dataset...")
-X_train = pd.read_csv("data/X_train.csv").values
-Y_train = pd.read_csv("data/Y_train.csv").values
-X_test = pd.read_csv("data/X_test.csv").values
-Y_test = pd.read_csv("data/Y_test.csv").values
+print("Loading data sets...")
+DATA_PATH = "data/"
+X_train = pd.read_csv("%sX_train.csv" % DATA_PATH).values
+Y_train = pd.read_csv("%sY_train.csv" % DATA_PATH).values
+X_test = pd.read_csv("%sX_test.csv" % DATA_PATH).values
+Y_test = pd.read_csv("%sY_test.csv" % DATA_PATH).values
 # transform panda df into arrays
 X_train = np.delete(X_train, 0, axis=1)
 Y_train = np.delete(Y_train, 0, axis=1).flatten()
