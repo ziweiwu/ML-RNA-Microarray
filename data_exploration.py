@@ -38,7 +38,7 @@ print("TSNE took at %.2f seconds" % (t1 - t0))
 # visualize TSNE and save the plot
 x_axis = tsne_results[:, 0]
 y_axis = tsne_results[:, 1]
-plt.scatter(x_axis, y_axis,c=Y_data, cmap=plt.cm.get_cmap("jet", 100))
+plt.scatter(x_axis, y_axis, c=Y_data, cmap=plt.cm.get_cmap("jet", 100))
 plt.colorbar(ticks=range(10))
 plt.clim(-0.5, 9.5)
 plt.title("TSNE Visualization")

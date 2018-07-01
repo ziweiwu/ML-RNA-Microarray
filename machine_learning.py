@@ -1,5 +1,4 @@
 import time
-from __future__ import print_function
 import pandas as pd
 import numpy as np
 from sklearn.metrics.classification import classification_report, jaccard_similarity_score, f1_score
