@@ -1,7 +1,7 @@
 import time
 import pandas as pd
 import numpy as np
-from sklearn.metrics.classification import classification_report, jaccard_similarity_score, f1_score
+from sklearn.metrics.classification import classification_report, jaccard_similarity_score
 from sklearn import svm, ensemble, linear_model
 from sklearn.model_selection import KFold, cross_val_score, GridSearchCV
 from sklearn.neural_network import MLPClassifier
@@ -55,7 +55,7 @@ print("Best params for rf:", rf_clf.best_params_, '\n')
 
 # parameter tuning for neural network
 parameters = {
-    'hidden_layer_sizes': [50, 100, 150, 200],
+    'hidden_layer_sizes': [50, 100, 200, 500],
     'alpha': [0.0001, 0.0005, 0.001, 0.005],
     'activation': ('relu', 'tanh', 'identity'),
 }
@@ -129,12 +129,12 @@ print("Random Forest Jaccard similarity score: {:5f}\n".format(rf_score))
 print("Neural Net Jaccard similarity score: {:5f}\n".format(nn_score))
 
 # measure and output f1 score
-print("F1 scores: ")
-sgd_score = f1_score(Y_test, sgd_pred)
-svm_score = f1_score(Y_test, svm_pred)
-rf_score = f1_score(Y_test, rf_pred)
-nn_score = f1_score(Y_test, nn_pred)
-print("SGD accuracy f1 score: {:5f}\n".format(sgd_score))
-print("SVM accuracy f1 score: {:5f}\n".format(svm_score))
-print("Random Forest f1 score: {:5f}\n".format(rf_score))
-print("Neural Net f1 score: {:5f}\n".format(nn_score))
+print("Classification report: ")
+print("SGD:")
+print(classification_report(Y_test, sgd_pred),"\n")
+print("SVM:")
+print(classification_report(Y_test, svm_pred),"\n")
+print("RF:")
+print(classification_report(Y_test, rf_pred),"\n")
+print("NN:")
+print(classification_report(Y_test, nn_pred))
