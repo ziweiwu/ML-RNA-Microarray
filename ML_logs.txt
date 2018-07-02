@@ -1,30 +1,35 @@
-Loading dataset...
+Loading data sets...
 Dataset loaded.
 Parameter tuning starts...
-Best params for sgd: {'alpha': 0.5, 'penalty': 'elasticnet'} 
+Best params for sgd: {'penalty': 'elasticnet', 'alpha': 0.5} 
 
-Best params for svm: {'kernel': 'poly', 'C': 1, 'gamma': 0.001} 
+Best params for svm: {'kernel': 'poly', 'gamma': 0.001, 'C': 1} 
 
-Best params for rf: {'n_estimators': 50, 'max_leaf_nodes': 50} 
-
-Best params for nn: {'hidden_layer_sizes': 200, 'alpha': 0.001, 'activation': 'relu'} 
-
-Parameter tuning finished.
-Cross validation starts...
-Linear svm score: 0.989733
-
-Non-linear svm score: 0.995876
-
-Random Forest score: 0.993814
-
-MPL Neural Network score: 0.983416
-
-
-Cross validation finished.
-Model fitting begins...
-sgd_clf training took 62.23 seconds
+Best params for rf: {'max_leaf_nodes': 50, 'n_estimators': 50} 
 
 Traceback (most recent call last):
-  File "/Users/ziweiwu/research/projects/microarray-analysis/machineLearning.py", line 94, in <module>
-    
-AttributeError: 'module' object has no attribute 'fit'
+  File "/Users/ziweiwu/research/projects/microarray-analysis/machine_learning.py", line 62, in <module>
+    nn_clf = GridSearchCV(estimator=nn_clf, param_grid=parameters).fit(X_train, Y_train)
+  File "/Users/ziweiwu/anaconda3/envs/ML-projects/lib/python3.4/site-packages/sklearn/model_selection/_search.py", line 639, in fit
+    cv.split(X, y, groups)))
+  File "/Users/ziweiwu/anaconda3/envs/ML-projects/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 779, in __call__
+    while self.dispatch_one_batch(iterator):
+  File "/Users/ziweiwu/anaconda3/envs/ML-projects/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 625, in dispatch_one_batch
+    self._dispatch(tasks)
+  File "/Users/ziweiwu/anaconda3/envs/ML-projects/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 588, in _dispatch
+    job = self._backend.apply_async(batch, callback=cb)
+  File "/Users/ziweiwu/anaconda3/envs/ML-projects/lib/python3.4/site-packages/sklearn/externals/joblib/_parallel_backends.py", line 111, in apply_async
+    result = ImmediateResult(func)
+  File "/Users/ziweiwu/anaconda3/envs/ML-projects/lib/python3.4/site-packages/sklearn/externals/joblib/_parallel_backends.py", line 332, in __init__
+    self.results = batch()
+  File "/Users/ziweiwu/anaconda3/envs/ML-projects/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 131, in __call__
+    return [func(*args, **kwargs) for func, args, kwargs in self.items]
+  File "/Users/ziweiwu/anaconda3/envs/ML-projects/lib/python3.4/site-packages/sklearn/externals/joblib/parallel.py", line 131, in <listcomp>
+    return [func(*args, **kwargs) for func, args, kwargs in self.items]
+  File "/Users/ziweiwu/anaconda3/envs/ML-projects/lib/python3.4/site-packages/sklearn/model_selection/_validation.py", line 448, in _fit_and_score
+    X_train, y_train = _safe_split(estimator, X, y, train)
+  File "/Users/ziweiwu/anaconda3/envs/ML-projects/lib/python3.4/site-packages/sklearn/utils/metaestimators.py", line 200, in _safe_split
+    X_subset = safe_indexing(X, indices)
+  File "/Users/ziweiwu/anaconda3/envs/ML-projects/lib/python3.4/site-packages/sklearn/utils/__init__.py", line 160, in safe_indexing
+    return X.take(indices, axis=0)
+KeyboardInterrupt
