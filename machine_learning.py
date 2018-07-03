@@ -211,25 +211,25 @@ sgd_matrix = confusion_matrix(Y_test, sgd_pred)
 np.set_printoptions(precision=2)
 plt.figure()
 plot_confusion_matrix(sgd_matrix, classes=class_names, title='SGD')
-plt.save('images/sgd_confusion_matrix.png')
+plt.savefig('images/sgd_confusion_matrix.png')
 
 # SVM
 svm_matrix = confusion_matrix(Y_test, svm_pred)
 np.set_printoptions(precision=2)
 plt.figure()
 plot_confusion_matrix(svm_matrix, classes=class_names, title='SVM')
-plt.save('images/svm_confusion_matrix.png')
+plt.savefig('images/svm_confusion_matrix.png')
 
 # RF
 rf_matrix = confusion_matrix(Y_test, rf_pred)
 np.set_printoptions(precision=2)
 plt.figure()
 plot_confusion_matrix(rf_matrix, classes=class_names, title='Random Forest')
-plt.save('images/rf_confusion_matrix.png')
+plt.savefig('images/rf_confusion_matrix.png')
 
 # NN
 nn_matrix = confusion_matrix(Y_test, nn_pred)
 np.set_printoptions(precision=2)
 plt.figure()
 plot_confusion_matrix(nn_matrix, classes=class_names, title='Neural Network')
-plt.save('images/nn_confusion_matrix.png')
+plt.savefig('images/nn_confusion_matrix.png')
