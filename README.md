@@ -6,13 +6,22 @@ bash import_env.sh
 ```
 
 ## Getting Started 
-To perform data visualizationa nd split data into train and test sets, run in command line
+To perform data exploration and generate a 2D visualization, run in command line
 ```
 python data_exploration.py
 ```
-To perform machine learning model selection and evaluation, run in command line
+To train machine learning models and parameter tuning, run in command line
 ```
-python machine_learning.py
+python model_training.py
+``` 
+To perform model evaluation, run in command line
+```
+python model_evaluation.py
+``` 
+
+To perform the entire workflow, run in command line
+```
+main.py
 ``` 
 
 ## Helpful links 

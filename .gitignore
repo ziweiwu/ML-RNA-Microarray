@@ -269,7 +269,7 @@ data
 # idea
 .idea/
 
-# models folder
+# models folder and files
 models/
+*.pkl
 
-# End of https://www.gitignore.io/api/vim,emacs,macos,python,pycharm
