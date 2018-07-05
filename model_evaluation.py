@@ -1,14 +1,11 @@
-import time
-import json
-import pandas as pd
-import numpy as np
 import itertools
+import json
+
 import matplotlib.pyplot as plt
-from sklearn.metrics.classification import confusion_matrix, jaccard_similarity_score
-from sklearn import svm, ensemble, linear_model
-from sklearn.model_selection import KFold, cross_val_score, GridSearchCV
-from sklearn.neural_network import MLPClassifier
+import numpy as np
+import pandas as pd
 from sklearn.externals import joblib
+from sklearn.metrics.classification import confusion_matrix, jaccard_similarity_score
 
 # load the training data
 DATA_PATH = "data/"
@@ -26,10 +23,10 @@ f.close()
 print("Dataset loaded.")
 
 # load models
-sgd_clf = joblib.load('sgd_clf.pkl')
-svm_clf = joblib.load('svm_clf.pkl')
-rf_clf = joblib.load('rf_clf.pkl')
-nn_clf = joblib.load('nn_clf.pkl')
+sgd_clf = joblib.load('models/sgd_clf.pkl')
+svm_clf = joblib.load('models/svm_clf.pkl')
+rf_clf = joblib.load('models/rf_clf.pkl')
+nn_clf = joblib.load('models/nn_clf.pkl')
 print("Models loaded")
 
 # make predictions
