@@ -274,9 +274,6 @@ tags
 #data
 **/data
 
-#idea
-.idea/
-
 #tar file
 *.gz
 
