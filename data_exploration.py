@@ -1,4 +1,5 @@
 import time
+import json
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
@@ -25,8 +26,16 @@ print(Y.shape)
 
 # label encode the multiple class string into integer values
 Y = Y.drop(Y.columns[0], axis=1)
-Y = Y.apply(LabelEncoder().fit_transform)
+le = LabelEncoder()
+le.fit(Y)
+class_names = list(le.classes_)
+Y = Y.apply(le.fit_transform)
 Y_data = Y.values.flatten()
+
+# save class names to a txt file
+f = open('%sclass_names.txt'%DATA_PATH, 'w')
+json.dump(class_names, f)
+f.close()
 
 # use TSNE to visualize the high dimension data in 2D
 t0 = time.time()
@@ -46,7 +55,7 @@ plt.savefig("./images/tsne_graph.png", dpi=600)
 
 # split data into training and testing set
 X_train, X_test, Y_train, Y_test \
-    = train_test_split(X, Y, test_size=0.40, random_state=100)
+    = train_test_split(X, Y, test_size=0.20, random_state=100, stratify=Y, shuffle=True)
 
 # save the train and test csv files
 X_train.to_csv("%sX_train.csv" % DATA_PATH)

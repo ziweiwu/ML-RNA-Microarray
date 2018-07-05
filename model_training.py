@@ -1,10 +1,15 @@
 import time
+import json
 import pandas as pd
 import numpy as np
-from sklearn.metrics.classification import classification_report, jaccard_similarity_score
+import itertools
+import matplotlib.pyplot as plt
+from sklearn.metrics.classification import confusion_matrix, jaccard_similarity_score
 from sklearn import svm, ensemble, linear_model
 from sklearn.model_selection import KFold, cross_val_score, GridSearchCV
 from sklearn.neural_network import MLPClassifier
+from sklearn.externals import joblib
+
 
 # load the training data
 print("Loading data sets...")
@@ -19,13 +24,57 @@ Y_train = np.delete(Y_train, 0, axis=1).flatten()
 X_test = np.delete(X_test, 0, axis=1)
 Y_test = np.delete(Y_test, 0, axis=1).flatten()
 
-print("Dataset loaded.")
+f = open("%sclass_names.txt" % DATA_PATH)
+class_names = json.load(f)
+f.close()
 
+print("Dataset loaded.")
 # define the models
 sgd_clf = linear_model.SGDClassifier(random_state=100, n_jobs=-1, max_iter=5)
 svm_clf = svm.SVC(random_state=100)
 rf_clf = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1)
 nn_clf = MLPClassifier(random_state=100)
+
+# test the models before parameter tuning
+print("Model fitting begins...")
+t0 = time.time()
+sgd_clf = sgd_clf.fit(X_train, Y_train)
+t1 = time.time()
+print("sgd_clf training took %.2f seconds\n" % (t1 - t0))
+
+t0 = time.time()
+svm_clf = svm_clf.fit(X_train, Y_train)
+t1 = time.time()
+print("SVM training took %.2f seconds\n" % (t1 - t0))
+
+t0 = time.time()
+rf_clf = rf_clf.fit(X_train, Y_train)
+t1 = time.time()
+print("Random Forest training took %.2f seconds\n" % (t1 - t0))
+
+t0 = time.time()
+nn_clf = nn_clf.fit(X_train, Y_train)
+t1 = time.time()
+print("Neural Network fitting took at %.2f seconds\n" % (t1 - t0))
+
+
+def kfold_model_score(model, X_train, Y_train, numFolds=5):
+    k_fold_shuttle = KFold(n_splits=numFolds, random_state=100).get_n_splits(X_train, Y_train)
+    return np.mean(cross_val_score(model, X_train, Y_train, cv=k_fold_shuttle))
+
+
+sgd_clf_score = kfold_model_score(sgd_clf, X_train, Y_train)
+print("Linear svm score: {:5f}\n".format(sgd_clf_score.mean()))
+
+svm_score = kfold_model_score(svm_clf, X_train, Y_train)
+print("Non-linear svm score: {:5f}\n".format(svm_score.mean()))
+
+rf_score = kfold_model_score(rf_clf, X_train, Y_train)
+print("Random Forest score: {:5f}\n".format(rf_score.mean()))
+
+nn_score = kfold_model_score(nn_clf, X_train, Y_train)
+print("MPL Neural Network score: {:5f}\n\n".format(nn_score.mean()))
+print("Cross validation finished.")
 
 # paremeter tuning for sgd, by default sgd fits a linear svm
 print("Parameter tuning starts...")
@@ -66,13 +115,7 @@ print("Parameter tuning finished.")
 
 print("Cross validation starts...")
 
-
-# cross validation to select the best model
-def kfold_model_score(model, X_train, Y_train, numFolds=5):
-    k_fold_shuttle = KFold(n_splits=numFolds, random_state=100).get_n_splits(X_train, Y_train)
-    return np.mean(cross_val_score(model, X_train, Y_train, cv=k_fold_shuttle))
-
-
+# test the models after parameter tuning
 sgd_clf_score = kfold_model_score(sgd_clf, X_train, Y_train)
 print("Linear svm score: {:5f}\n".format(sgd_clf_score.mean()))
 
@@ -110,31 +153,9 @@ print("Neural Network fitting took at %.2f seconds\n" % (t1 - t0))
 
 print("Model fitting finished.")
 
-print("Making predictions.")
-# make predictions
-sgd_pred = sgd_clf.predict(X_test)
-svm_pred = svm_clf.predict(X_test)
-rf_pred = rf_clf.predict(X_test)
-nn_pred = nn_clf.predict(X_test)
-
-# measure and output accuracy
-print("Jaccard similarity scores: ")
-sgd_score = jaccard_similarity_score(Y_test, sgd_pred)
-svm_score = jaccard_similarity_score(Y_test, svm_pred)
-rf_score = jaccard_similarity_score(Y_test, rf_pred)
-nn_score = jaccard_similarity_score(Y_test, nn_pred)
-print("SGD Jaccard similarity score: {:5f}\n".format(sgd_score))
-print("SVM Jaccard similarity : {:5f}\n".format(svm_score))
-print("Random Forest Jaccard similarity score: {:5f}\n".format(rf_score))
-print("Neural Net Jaccard similarity score: {:5f}\n".format(nn_score))
-
-# measure and output f1 score
-print("Classification report: ")
-print("SGD:")
-print(classification_report(Y_test, sgd_pred),"\n")
-print("SVM:")
-print(classification_report(Y_test, svm_pred),"\n")
-print("RF:")
-print(classification_report(Y_test, rf_pred),"\n")
-print("NN:")
-print(classification_report(Y_test, nn_pred))
+# save the models
+joblib.dump(sgd_clf, 'models/sgd_clf.pkl')
+joblib.dump(svm_clf, 'models/svm_clf.pkl')
+joblib.dump(rf_clf, 'models/rf_clf.pkl')
+joblib.dump(nn_clf, 'models/nn_clf.pkl')
+print("Models saved.")
