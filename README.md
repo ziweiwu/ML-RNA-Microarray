@@ -6,6 +6,10 @@ bash import_env.sh
 ```
 
 ## Getting Started 
+To download the data set
+```
+bash download_dataset.sh
+```
 To perform data exploration and generate a 2D visualization, run in command line
 ```
 python data_exploration.py
