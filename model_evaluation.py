@@ -1,6 +1,5 @@
 import itertools
 import json
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -11,8 +10,8 @@ from sklearn.metrics.classification import confusion_matrix, jaccard_similarity_
 DATA_PATH = "data/"
 X_test = pd.read_csv("%sX_test.csv" % DATA_PATH).values
 Y_test = pd.read_csv("%sY_test.csv" % DATA_PATH).values
-# transform panda df into arrays
 
+# transform panda df into arrays
 X_test = np.delete(X_test, 0, axis=1)
 Y_test = np.delete(Y_test, 0, axis=1).flatten()
 
@@ -41,10 +40,10 @@ sgd_score = jaccard_similarity_score(Y_test, sgd_pred)
 svm_score = jaccard_similarity_score(Y_test, svm_pred)
 rf_score = jaccard_similarity_score(Y_test, rf_pred)
 nn_score = jaccard_similarity_score(Y_test, nn_pred)
-print("SGD Jaccard similarity score: {:5f}\n".format(sgd_score))
-print("SVM Jaccard similarity : {:5f}\n".format(svm_score))
-print("Random Forest Jaccard similarity score: {:5f}\n".format(rf_score))
-print("Neural Net Jaccard similarity score: {:5f}\n".format(nn_score))
+print("SGD Jaccard similarity score: {:5f}".format(sgd_score))
+print("SVM Jaccard similarity : {:5f}".format(svm_score))
+print("Random Forest Jaccard similarity score: {:5f}".format(rf_score))
+print("Neural Net Jaccard similarity score: {:5f}".format(nn_score))
 
 
 # plot confusion matrix
