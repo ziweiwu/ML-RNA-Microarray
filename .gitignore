@@ -101,6 +101,9 @@ Temporary Items
 .idea/**/gradle.xml
 .idea/**/libraries
 
+# VsCode
+.vscode
+
 # CMake
 cmake-build-debug/
 
@@ -251,11 +254,11 @@ Session.vim
 # auto-generated tag files
 tags
 
+#data
+data/*
+
 #csv
 *.csv
-
-#data
-data
 
 #tar file
 *.gz
