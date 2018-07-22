@@ -22,3 +22,4 @@ dependencies:
   - six=1.10.0=py34_0
   - toolz=0.8.2=py34_0
   - wheel=0.29.0=py34_0
+  - Jupyter
