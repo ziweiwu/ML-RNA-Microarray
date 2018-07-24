@@ -4,10 +4,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.externals import joblib
+from sklearn.feature_selection import SelectFromModel
 from sklearn.metrics.classification import confusion_matrix, jaccard_similarity_score
 
 # load the training data
 DATA_PATH = "data/"
+X = pd.read_csv("%sX_train.csv" % DATA_PATH)
+Y_train = pd.read_csv("%sY_train.csv" % DATA_PATH).values
 X_test = pd.read_csv("%sX_test.csv" % DATA_PATH).values
 Y_test = pd.read_csv("%sY_test.csv" % DATA_PATH).values
 
@@ -27,6 +30,24 @@ svm_clf = joblib.load('models/svm_clf.pkl')
 rf_clf = joblib.load('models/rf_clf.pkl')
 nn_clf = joblib.load('models/nn_clf.pkl')
 print("Models loaded")
+
+# Query the 10 most important gene for random forest classifier
+importances = rf_clf.estimator.feature_importances_
+std = np.std([tree.feature_importances_ for tree in rf_clf.estimator],
+             axis=0)
+indices = np.argsort(importances)[::-1]
+
+# Print the feature ranking
+print("Feature ranking:")
+for f in range(30):
+    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+
+
+
+
+
+
+
 
 # make predictions
 sgd_pred = sgd_clf.predict(X_test)

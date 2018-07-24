@@ -1,8 +1,11 @@
 import data_exploration
 import model_training
 import model_evaluation
-import subprocess
+# import subprocess
 
-subprocess.call(data_exploration)
-subprocess.call(model_evaluation)
-subprocess.call(model_training)
+# subprocess.call(data_exploration)
+# subprocess.call(model_evaluation)
+# subprocess.call(model_training)
+
+# execfile('data_exploration.py')
+# execfile('modeo_training.py')

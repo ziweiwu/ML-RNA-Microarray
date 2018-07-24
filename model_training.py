@@ -10,7 +10,6 @@ from sklearn.model_selection import KFold, cross_val_score, GridSearchCV
 from sklearn.neural_network import MLPClassifier
 from sklearn.externals import joblib
 
-
 # load the training data
 print("Loading data sets...")
 DATA_PATH = "data/"
@@ -18,6 +17,7 @@ X_train = pd.read_csv("%sX_train.csv" % DATA_PATH).values
 Y_train = pd.read_csv("%sY_train.csv" % DATA_PATH).values
 X_test = pd.read_csv("%sX_test.csv" % DATA_PATH).values
 Y_test = pd.read_csv("%sY_test.csv" % DATA_PATH).values
+
 # transform panda df into arrays
 X_train = np.delete(X_train, 0, axis=1)
 Y_train = np.delete(Y_train, 0, axis=1).flatten()
@@ -29,6 +29,7 @@ class_names = json.load(f)
 f.close()
 
 print("Dataset loaded.")
+
 # define the models
 sgd_clf = linear_model.SGDClassifier(random_state=100, n_jobs=-1, max_iter=5)
 svm_clf = svm.SVC(random_state=100)
