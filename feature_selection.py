@@ -33,43 +33,58 @@ print("Dataset loaded.")
 
 
 ########################################################################################
-#                     parameter tuning for SVM and RF
+#                     parameter tuning for SVM, RF and logistic regression
 ########################################################################################
 def kfold_model_score(model, X_train, Y_train, numFolds=5):
     k_fold_shuttle = KFold(n_splits=numFolds, random_state=100).get_n_splits(X_train, Y_train)
     return np.mean(cross_val_score(model, X_train, Y_train, cv=k_fold_shuttle))
 
 
-# # test alpha value in increasing order
-# alpha_params = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 5, 50, 100, 200, 500, 1000]
-#
-#
-# def tune_alpha(alpha_params, X_train, Y_train, X_test, Y_test):
-#     for alpha in alpha_params:
-#         model = linear_model.SGDClassifier(random_state=100, alpha=alpha, n_jobs=-1, penalty="l1", tol=1e-3)
-#         model = model.fit(X_train, Y_train)
-#         model_pred = model.predict(X_test)
-#         model_score = jaccard_similarity_score(Y_test, model_pred)
-#         print("Linear SVC score with alpha {:5f}: {:5f}".format(alpha, model_score.mean()))
-#
-#
-# tune_alpha(alpha_params, X_train, Y_train, X_test, Y_test)
-#
-# # test the effect of number of tree on accuracy for random forest
-# rf_clf = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1)
-# trees = [5, 10, 15, 20, 25, 50, 75, 100]
-#
-#
-# def tune_trees(trees, X_train, Y_train, X_test, Y_test):
-#     for tree in trees:
-#         model = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1, n_estimators=tree)
-#         model = model.fit(X_train, Y_train)
-#         model_pred = model.predict(X_test)
-#         model_score = jaccard_similarity_score(Y_test, model_pred)
-#         print("Random Forest score with {} trees: {:5f}".format(tree, model_score.mean()))
-#
-#
-# tune_trees(trees, X_train, Y_train, X_test, Y_test)
+# test alpha value in increasing order
+alpha_params = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 5, 50, 100, 200, 500, 1000]
+
+
+def tune_alpha(alpha_params, X_train, Y_train, X_test, Y_test):
+    for alpha in alpha_params:
+        model = linear_model.SGDClassifier(random_state=100, alpha=alpha, n_jobs=-1, penalty="l1", tol=1e-3)
+        model = model.fit(X_train, Y_train)
+        model_pred = model.predict(X_test)
+        model_score = jaccard_similarity_score(Y_test, model_pred)
+        print("Linear SVC score with alpha {:5f}: {:5f}".format(alpha, model_score.mean()))
+
+
+tune_alpha(alpha_params, X_train, Y_train, X_test, Y_test)
+
+# test the effect of number of tree on accuracy for random forest
+rf_clf = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1)
+trees = [5, 10, 15, 20, 25, 50, 75, 100]
+
+
+def tune_trees(trees, X_train, Y_train, X_test, Y_test):
+    for tree in trees:
+        model = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1, n_estimators=tree)
+        model = model.fit(X_train, Y_train)
+        model_pred = model.predict(X_test)
+        model_score = jaccard_similarity_score(Y_test, model_pred)
+        print("Random Forest score with {} trees: {:5f}".format(tree, model_score.mean()))
+
+
+tune_trees(trees, X_train, Y_train, X_test, Y_test)
+
+# test  C parameters for logistic regression
+C_params = [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000]
+
+
+def tune_C(C_params, X_train, Y_train, X_test, Y_test):
+    for C in C_params:
+        model = linear_model.LogisticRegression(random_state=100, C=C)
+        model = model.fit(X_train, Y_train)
+        model_pred = model.predict(X_test)
+        model_score = jaccard_similarity_score(Y_test, model_pred)
+        print("Logistic Regression score with C={}: {:5f}".format(C, model_score.mean()))
+
+
+tune_C(C_params, X_train, Y_train, X_test, Y_test)
 
 ########################################################################################
 #                    Feature selection
@@ -82,18 +97,18 @@ print("\nPerforming feature selection using Sparse SVM and RF \n")
 # 200 features, -> 20 -> 10
 # draw graph to visualize different method for feature selection Y: accuracy, X: num of features
 
-C_params = [1e-13, 1e-12,1e-10, 1e-09, 1e-08, 1e-07, 1e-06, 0.00001, 0.00005, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 1000000]
+C_params = [0.0001, 0.00015, 0.0002, 0.00025, 0.0003, 0.0004, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.1, 1,
+            10, 100, 1000, 10000, 100000, 1000000]
 C_params.reverse()
 print(C_params)
-
 
 
 # perform feature selection using sparse svm
 def svm_feature_selection(C_params):
     for C in C_params:
-        svm_select= svm.LinearSVC(random_state=100, penalty="l1", C=C, dual=True, tol=1e-4)
+        svm_select = svm.LinearSVC(random_state=100, penalty="l1", C=C, dual=False, tol=1e-4)
         svm_select = SelectFromModel(svm_select).fit(X_train, Y_train)
-        svm_features= svm_select.transform(X_train)
+        svm_features = svm_select.transform(X_train)
         print("\nWith C={}".format(C))
         print("Sparse SVM reduced number of features to {}.".format(svm_features.shape[1]))
         svm_clf_l1 = linear_model.SGDClassifier(random_state=100, penalty="l1", n_jobs=-1, alpha=0.01, tol=1e-4)
@@ -104,7 +119,8 @@ def svm_feature_selection(C_params):
 svm_feature_selection(C_params)
 
 # perform feature selection using rf, use mean as threshold
-thresholds = [0, 1e-06, 2e-06, 5e-06, 1e-05, 2e-05, 5e-05, 0.00001, 0.00005, 0.0001, 0.0005, 0.001]
+thresholds = [0, 1e-06, 2e-06, 5e-06, 1e-05, 2e-05, 5e-05, 0.00001, 0.00005, 0.0001, 0.0005, 0.001, 0.002, 0.003, 0.004,
+              0.005, 0.006, 0.007, 0.008, 0.009, 0.01]
 
 
 def rf_feature_selection(thresholds):
@@ -122,3 +138,23 @@ def rf_feature_selection(thresholds):
 
 
 rf_feature_selection(thresholds)
+
+# perform feature selection using logistic regression
+C_params = [0.0001, 0.00015, 0.0002, 0.00025, 0.0003, 0.0004, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.1, 1,
+            10, 100, 1000, 10000, 100000, 1000000]
+C_params.reverse()
+
+
+def logit_feature_selection(C_params):
+    for C in C_params:
+        logit_select = linear_model.LogisticRegression(random_state=100, penalty="l1", C=C, tol=1e-4)
+        logit_select = SelectFromModel(logit_select).fit(X_train, Y_train)
+        logit_features = logit_select.transform(X_train)
+        print("\nWith C={}".format(C))
+        print("Logistic regression reduced number of features to {}.".format(logit_features.shape[1]))
+        logit_clf = linear_model.LogisticRegression(random_state=100, penalty="l1", tol=1e-4)
+        logit_clf_score = kfold_model_score(logit_clf, logit_features, Y_train)
+        print("Logistic regression score after FEATURE SELECTION: {:5f}".format(logit_clf_score.mean()))
+
+
+logit_feature_selection(C_params)
