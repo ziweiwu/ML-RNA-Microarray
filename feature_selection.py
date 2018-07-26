@@ -6,7 +6,6 @@ from sklearn.model_selection import KFold, cross_val_score
 from sklearn.feature_selection import SelectFromModel
 from sklearn.metrics.classification import jaccard_similarity_score
 
-# from model_evaluation import plot_confusion_matrix
 
 ########################################################################################
 #                    Load dataset
@@ -97,7 +96,7 @@ print("\nPerforming feature selection using Sparse SVM and RF \n")
 # 200 features, -> 20 -> 10
 # draw graph to visualize different method for feature selection Y: accuracy, X: num of features
 
-C_params = [0.0001, 0.00015, 0.0002, 0.00025, 0.0003, 0.0004, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.1, 1,
+C_params = [0.00015, 0.0002, 0.00025, 0.0003, 0.0004, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.1, 1,
             10, 100, 1000, 10000, 100000, 1000000]
 C_params.reverse()
 print(C_params)
@@ -140,7 +139,7 @@ def rf_feature_selection(thresholds):
 rf_feature_selection(thresholds)
 
 # perform feature selection using logistic regression
-C_params = [0.0001, 0.00015, 0.0002, 0.00025, 0.0003, 0.0004, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.1, 1,
+C_params = [0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.1, 1,
             10, 100, 1000, 10000, 100000, 1000000]
 C_params.reverse()
 
