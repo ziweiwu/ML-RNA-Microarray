@@ -1,11 +1,12 @@
 import json
 import pandas as pd
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
 from sklearn import svm, ensemble, linear_model
 from sklearn.model_selection import KFold, cross_val_score
 from sklearn.feature_selection import SelectFromModel
 from sklearn.metrics.classification import jaccard_similarity_score
+from matplotlib.pyplot import figure
 
 ########################################################################################
 #                    Load dataset
@@ -96,10 +97,12 @@ print("\nPerforming feature selection using Sparse SVM and RF \n")
 # 200 features, -> 20 -> 10
 # draw graph to visualize different method for feature selection Y: accuracy, X: num of features
 
-C_params = [0.00015, 0.0002, 0.00025, 0.0003, 0.0004, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.1, 1,
+C_params = [0.0001, 0.00015, 0.0002, 0.00025, 0.0003, 0.0004, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.1, 1,
             10, 100, 1000, 10000, 100000, 1000000]
 C_params.reverse()
-print(C_params)
+
+n_features_svm = []
+accuracy_svm = []
 
 
 # perform feature selection using sparse svm
@@ -113,13 +116,18 @@ def svm_feature_selection(C_params):
         svm_clf_l1 = linear_model.SGDClassifier(random_state=100, penalty="l1", n_jobs=-1, alpha=0.01, tol=1e-4)
         svm_clf_l1_score = kfold_model_score(svm_clf_l1, svm_features, Y_train)
         print("SGD l1 CV score after FEATURE SELECTION: {:5f}".format(svm_clf_l1_score.mean()))
+        n_features_svm.append(svm_features.shape[1])
+        accuracy_svm.append(svm_clf_l1_score.mean())
 
 
 svm_feature_selection(C_params)
 
 # perform feature selection using rf, use mean as threshold
 thresholds = [0, 1e-06, 2e-06, 5e-06, 1e-05, 2e-05, 5e-05, 0.00001, 0.00005, 0.0001, 0.0005, 0.001, 0.002, 0.003, 0.004,
-              0.005, 0.006, 0.007, 0.008, 0.009, 0.01]
+              0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.011]
+
+n_features_rf = []
+accuracy_rf = []
 
 
 def rf_feature_selection(thresholds):
@@ -134,16 +142,19 @@ def rf_feature_selection(thresholds):
         rf_clf = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1, n_estimators=50)
         rf_clf_score = kfold_model_score(rf_clf, rf_features, Y_train)
         print("RF CV score after FEATURE SELECTION: {:5f}".format(rf_clf_score.mean()))
+        n_features_rf.append(rf_features.shape[1])
+        accuracy_rf.append(rf_clf_score.mean())
 
 
 rf_feature_selection(thresholds)
 
 # perform feature selection using logistic regression
-C_params = [0.0005, 0.0006, 0.0007, 0.0008, 0.0009, 0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.1, 1,
+C_params = [0.0005, 0.0006, 0.0007, 0.0008, 0.0009, 0.001, 0.002, 0.003, 0.004, 0.005, 0.01,
             10, 100, 1000, 10000, 100000, 1000000]
 C_params.reverse()
 
-feature_accuracy = {}
+n_features_logit = []
+accuracy_logit = []
 
 
 def logit_feature_selection(C_params):
@@ -156,9 +167,33 @@ def logit_feature_selection(C_params):
         logit_clf = linear_model.LogisticRegression(random_state=100, penalty="l1", tol=1e-4)
         logit_clf_score = kfold_model_score(logit_clf, logit_features, Y_train)
         print("Logistic regression score after FEATURE SELECTION: {:5f}".format(logit_clf_score.mean()))
-        feature_accuracy[logit_features.shape[1]] = logit_clf_score.mean()
+        n_features_logit.append(logit_features.shape[1])
+        accuracy_logit.append(logit_clf_score.mean())
 
 
 logit_feature_selection(C_params)
 
-print(feature_accuracy)
+########################################################################################
+#                    Feature Selection Performance
+########################################################################################
+print(n_features_svm)
+print(accuracy_svm)
+print(n_features_rf)
+print(accuracy_rf)
+print(n_features_logit)
+print(accuracy_logit)
+
+figure(num=None, figsize=(8, 6), dpi=500, facecolor='w', edgecolor='k')
+plt.xlabel('Number of Features')
+plt.ylabel('Accuracy')
+plt.title("Number of Features vs. Accuracy")
+plt.plot(n_features_svm, accuracy_svm, 'o-')
+plt.plot(n_features_rf, accuracy_rf, '^-', color='green')
+plt.plot(n_features_logit, accuracy_logit, 's-', color='red')
+plt.legend(['SVM', 'Random Forest', 'Logistic Regression'])
+
+plt.axis([0, 200, 0.5, 1])
+plt.figure()
+plt.show()
+plt.savefig('images/feature_selection_performance.png')
+plt.close()

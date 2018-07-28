@@ -1,8 +1,8 @@
 # Classifying Tumor from RNA Microarray using Machine Learning
 ## Setup the environment
-To set up the Python environment, install `mini-conda`  or `anaconda3`, then run in command line
+Install pipenv and run pipenv install in pipenv shell
 ```
-bash import_env.sh
+pipenv install
 ```
 
 ## Getting Started 
