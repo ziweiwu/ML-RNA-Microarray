@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import svm, ensemble, linear_model
-from sklearn.model_selection import KFold, cross_val_score
-from sklearn.feature_selection import SelectFromModel
+from sklearn.model_selection import KFold, cross_val_score, GridSearchCV
+from sklearn.feature_selection import SelectFromModel, RFECV
 from sklearn.metrics.classification import jaccard_similarity_score
 from matplotlib.pyplot import figure
 
@@ -40,42 +40,43 @@ def kfold_model_score(model, X_train, Y_train, numFolds=5):
     return np.mean(cross_val_score(model, X_train, Y_train, cv=k_fold_shuttle))
 
 
-# test alpha value in increasing order
-alpha_params = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 5, 50, 100, 200, 500, 1000]
+# test C for svm
+# test  C parameters for logistic regression
+C_params = [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000]
 
 
-def tune_alpha(alpha_params, X_train, Y_train, X_test, Y_test):
-    for alpha in alpha_params:
-        model = linear_model.SGDClassifier(random_state=100, alpha=alpha, n_jobs=-1, penalty="l1", tol=1e-3)
+def tune_C_svm(C_params, X_train, Y_train, X_test, Y_test):
+    for C in C_params:
+        model = svm.LinearSVC(random_state=100, C=C, penalty="l1", dual=False, tol=1e-4)
         model = model.fit(X_train, Y_train)
         model_pred = model.predict(X_test)
         model_score = jaccard_similarity_score(Y_test, model_pred)
-        print("Linear SVC score with alpha {:5f}: {:5f}".format(alpha, model_score.mean()))
+        print("SVM score with C={:5f}: {:5f}".format(C, model_score.mean()))
 
 
-tune_alpha(alpha_params, X_train, Y_train, X_test, Y_test)
+tune_C_svm(C_params, X_train, Y_train, X_test, Y_test)
 
-# test the effect of number of tree on accuracy for random forest
+# do a grid search to find optimal parameter for random forest
+parameters = {
+    'n_estimators': [10, 20, 30, 40, 50],
+    'max_leaf_nodes': [50, 100, 150, 200],
+    'min_samples_split': [2, 3, 10],
+    'min_samples_leaf': [1, 3, 10],
+    'bootstrap': [True, False],
+    'criterion': ['gini', 'entropy']
+}
+
 rf_clf = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1)
-trees = [5, 10, 15, 20, 25, 50, 75, 100]
-
-
-def tune_trees(trees, X_train, Y_train, X_test, Y_test):
-    for tree in trees:
-        model = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1, n_estimators=tree)
-        model = model.fit(X_train, Y_train)
-        model_pred = model.predict(X_test)
-        model_score = jaccard_similarity_score(Y_test, model_pred)
-        print("Random Forest score with {} trees: {:5f}".format(tree, model_score.mean()))
-
-
-tune_trees(trees, X_train, Y_train, X_test, Y_test)
+rf_clf = GridSearchCV(estimator=rf_clf, param_grid=parameters).fit(X_train, Y_train)
+sorted(rf_clf.cv_results_.keys())
+print("The optimal parameters for random forest classifier are: ")
+print(rf_clf.best_params)
 
 # test  C parameters for logistic regression
 C_params = [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000]
 
 
-def tune_C(C_params, X_train, Y_train, X_test, Y_test):
+def tune_C_logit(C_params, X_train, Y_train, X_test, Y_test):
     for C in C_params:
         model = linear_model.LogisticRegression(random_state=100, C=C, penalty="l1")
         model = model.fit(X_train, Y_train)
@@ -84,7 +85,7 @@ def tune_C(C_params, X_train, Y_train, X_test, Y_test):
         print("Logistic Regression score with C={}: {:5f}".format(C, model_score.mean()))
 
 
-tune_C(C_params, X_train, Y_train, X_test, Y_test)
+tune_C_logit(C_params, X_train, Y_train, X_test, Y_test)
 
 ########################################################################################
 #                    Feature selection
@@ -113,9 +114,9 @@ def svm_feature_selection(C_params):
         svm_features = svm_select.transform(X_train)
         print("\nWith C={}".format(C))
         print("Sparse SVM reduced number of features to {}.".format(svm_features.shape[1]))
-        svm_clf_l1 = linear_model.SGDClassifier(random_state=100, penalty="l1", n_jobs=-1, alpha=0.01, tol=1e-4)
+        svm_clf_l1 = svm.LinearSVC(random_state=100, penalty="l1", C=1, dual=False, tol=1e-4)
         svm_clf_l1_score = kfold_model_score(svm_clf_l1, svm_features, Y_train)
-        print("SGD l1 CV score after FEATURE SELECTION: {:5f}".format(svm_clf_l1_score.mean()))
+        print("Linear SVC l1 CV score after FEATURE SELECTION: {:5f}".format(svm_clf_l1_score.mean()))
         n_features_svm.append(svm_features.shape[1])
         accuracy_svm.append(svm_clf_l1_score.mean())
 

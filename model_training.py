@@ -101,6 +101,7 @@ parameters = {
     'max_leaf_nodes': [50, 100, 150, 200]
 }
 rf_clf = GridSearchCV(estimator=rf_clf, param_grid=parameters).fit(X_train, Y_train)
+print(rf_clf.score())
 print("Best params for rf:", rf_clf.best_params_, '\n')
 
 # parameter tuning for neural network

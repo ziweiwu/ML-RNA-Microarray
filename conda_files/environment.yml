@@ -14,7 +14,7 @@ dependencies:
   - python=3.4.5=0
   - python-dateutil=2.6.1=py34_0
   - pytz=2017.2=py34_0
-  - scikit-learn=0.18.1=np111py34_1
+  - scikit-learn=.18.01=np111py34_1
   - scipy=0.18.1=np111py34_1
   - seaborn=0.7.1=py34_0
   - setuptools=27.2.0=py34_0
