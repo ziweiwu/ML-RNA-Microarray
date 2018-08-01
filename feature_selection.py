@@ -1,7 +1,9 @@
 import json
+import itertools
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.externals import joblib
 from sklearn import svm, ensemble, linear_model
 from sklearn.model_selection import KFold, cross_val_score, GridSearchCV
 from sklearn.feature_selection import SelectFromModel, RFECV
@@ -194,3 +196,13 @@ plt.plot(n_features_logit, accuracy_logit, 's-', color='red')
 plt.legend(['SVM', 'Random Forest', 'Logistic Regression'], loc=5)
 plt.axis([0, 200, 0.5, 1])
 plt.savefig('images/feature_selection_performance.png', dpi=600)
+
+
+########################################################################################
+#                   test accuracy after feature selection
+########################################################################################
+sgd_clf = joblib.load('models/sgd_clf.pkl')
+svm_clf = joblib.load('models/svm_clf.pkl')
+rf_clf = joblib.load('models/rf_clf.pkl')
+nn_clf = joblib.load('models/nn_clf.pkl')
+print("Models loaded")
