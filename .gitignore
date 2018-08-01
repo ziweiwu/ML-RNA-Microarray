@@ -276,3 +276,6 @@ data/*
 models/
 *.pkl
 
+# lock file
+*.lock
+

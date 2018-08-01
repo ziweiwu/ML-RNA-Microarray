@@ -7,7 +7,7 @@ from sklearn.externals import joblib
 from sklearn import svm, ensemble, linear_model
 from sklearn.model_selection import KFold, cross_val_score, GridSearchCV
 from sklearn.feature_selection import SelectFromModel, RFECV
-from sklearn.metrics.classification import jaccard_similarity_score
+from sklearn.metrics.classification import jaccard_similarity_score, confusion_matrix
 from matplotlib.pyplot import figure
 
 ########################################################################################
@@ -92,13 +92,7 @@ tune_C_logit(C_params, X_train, Y_train, X_test, Y_test)
 ########################################################################################
 #                    Feature selection
 ########################################################################################
-print("\nPerforming feature selection using Sparse SVM and RF \n")
-
-# TODO
-# use defealt threshold level
-# 3 methods to feature selection, svm, rf, logistic regression
-# 200 features, -> 20 -> 10
-# draw graph to visualize different method for feature selection Y: accuracy, X: num of features
+# TODO parameter tuning with limited set of feature on training data, before test on test data
 
 C_params = [0.0001, 0.00015, 0.0002, 0.00025, 0.0003, 0.0004, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.01, 0.1, 1,
             10, 100, 1000, 10000, 100000, 1000000]
@@ -111,16 +105,20 @@ accuracy_svm = []
 # perform feature selection using sparse svm
 def svm_feature_selection(C_params):
     for C in C_params:
-        svm_select = svm.LinearSVC(random_state=100, penalty="l1", C=C, dual=False, tol=1e-4)
-        svm_select = SelectFromModel(svm_select).fit(X_train, Y_train)
-        svm_features = svm_select.transform(X_train)
+        model_select = svm.LinearSVC(random_state=100, penalty="l1", C=C, dual=False, tol=1e-4)
+        model_select = SelectFromModel(model_select).fit(X_train, Y_train)
+        train_features = model_select.transform(X_train)
+        test_features = model_select.transform(X_test)
         print("\nWith C={}".format(C))
-        print("Sparse SVM reduced number of features to {}.".format(svm_features.shape[1]))
-        svm_clf_l1 = svm.LinearSVC(random_state=100, penalty="l1", C=1, dual=False, tol=1e-4)
-        svm_clf_l1_score = kfold_model_score(svm_clf_l1, svm_features, Y_train)
-        print("Linear SVC l1 CV score after FEATURE SELECTION: {:5f}".format(svm_clf_l1_score.mean()))
-        n_features_svm.append(svm_features.shape[1])
-        accuracy_svm.append(svm_clf_l1_score.mean())
+        print("Sparse SVM reduced number of features to {}.".format(test_features.shape[1]))
+
+        model = svm.LinearSVC(random_state=100, penalty="l1", C=1, dual=False, tol=1e-4)
+        model = model.fit(train_features, Y_train)
+        model_pred = model.predict(test_features)
+        score = jaccard_similarity_score(model_pred, Y_test)
+        print("Linear SVC score after FEATURE SELECTION: {:5f}".format(score))
+        n_features_svm.append(test_features.shape[1])
+        accuracy_svm.append(score)
 
 
 svm_feature_selection(C_params)
@@ -135,18 +133,20 @@ accuracy_rf = []
 
 def rf_feature_selection(thresholds):
     for threshold in thresholds:
-        rf_clf = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1, n_estimators=50)
-        rf_select = SelectFromModel(estimator=rf_clf, threshold=threshold)
-        rf_select = rf_select.fit(X_train, Y_train)
-        rf_features = rf_select.transform(X_train)
+        model = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1, n_estimators=50)
+        model_select = SelectFromModel(model, threshold=threshold).fit(X_train, Y_train)
+        train_features = model_select.transform(X_train)
+        test_features = model_select.transform(X_test)
         print("\nWith threshold {}".format(threshold))
-        print("RF reduced number of features to {}.".format(rf_features.shape[1]))
+        print("RF reduced number of features to {}.".format(test_features.shape[1]))
 
-        rf_clf = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1, n_estimators=50)
-        rf_clf_score = kfold_model_score(rf_clf, rf_features, Y_train)
-        print("RF CV score after FEATURE SELECTION: {:5f}".format(rf_clf_score.mean()))
-        n_features_rf.append(rf_features.shape[1])
-        accuracy_rf.append(rf_clf_score.mean())
+        model = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1, n_estimators=50)
+        model = model.fit(train_features, Y_train)
+        model_pred = model.predict(test_features)
+        score = jaccard_similarity_score(model_pred, Y_test)
+        print("RF CV score after FEATURE SELECTION: {:5f}".format(score))
+        n_features_rf.append(test_features.shape[1])
+        accuracy_rf.append(score)
 
 
 rf_feature_selection(thresholds)
@@ -162,16 +162,20 @@ accuracy_logit = []
 
 def logit_feature_selection(C_params):
     for C in C_params:
-        logit_select = linear_model.LogisticRegression(random_state=100, penalty="l1", C=C, tol=1e-4)
-        logit_select = SelectFromModel(logit_select).fit(X_train, Y_train)
-        logit_features = logit_select.transform(X_train)
+        model = linear_model.LogisticRegression(random_state=100, penalty="l1", C=C, tol=1e-4)
+        model_select = SelectFromModel(model).fit(X_train, Y_train)
+        train_features = model_select.transform(X_train)
+        test_features = model_select.transform(X_test)
         print("\nWith C={}".format(C))
-        print("Logistic regression reduced number of features to {}.".format(logit_features.shape[1]))
-        logit_clf = linear_model.LogisticRegression(random_state=100, penalty="l1", tol=1e-4)
-        logit_clf_score = kfold_model_score(logit_clf, logit_features, Y_train)
-        print("Logistic regression score after FEATURE SELECTION: {:5f}".format(logit_clf_score.mean()))
-        n_features_logit.append(logit_features.shape[1])
-        accuracy_logit.append(logit_clf_score.mean())
+        print("Logistic regression reduced number of features to {}.".format(test_features.shape[1]))
+
+        model = linear_model.LogisticRegression(random_state=100, penalty="l1", tol=1e-4)
+        model = model.fit(train_features, Y_train)
+        model_pred = model.predict(test_features)
+        score = jaccard_similarity_score(model_pred, Y_test)
+        print("Logistic regression score after FEATURE SELECTION: {:5f}".format(score))
+        n_features_logit.append(test_features.shape[1])
+        accuracy_logit.append(score)
 
 
 logit_feature_selection(C_params)
