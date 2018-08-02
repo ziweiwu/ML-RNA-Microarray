@@ -43,12 +43,6 @@ for f in range(30):
     print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
 
 
-
-
-
-
-
-
 # make predictions
 sgd_pred = sgd_clf.predict(X_test)
 svm_pred = svm_clf.predict(X_test)
