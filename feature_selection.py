@@ -2,11 +2,15 @@ import json
 import itertools
 import pandas as pd
 import numpy as np
+import matplotlib
+
+# https://markhneedham.com/blog/2018/05/04/python-runtime-error-osx-matplotlib-not-installed-as-framework-mac/
+matplotlib.use('TkAgg')  # to solve the issue of reporting python is not used as framework,
 import matplotlib.pyplot as plt
 from sklearn.externals import joblib
 from sklearn import svm, ensemble, linear_model
 from sklearn.model_selection import KFold, cross_val_score, GridSearchCV
-from sklearn.feature_selection import SelectFromModel, RFECV
+from sklearn.feature_selection import SelectFromModel
 from sklearn.metrics.classification import jaccard_similarity_score, confusion_matrix
 from matplotlib.pyplot import figure
 
@@ -72,7 +76,7 @@ rf_clf = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1)
 rf_clf = GridSearchCV(estimator=rf_clf, param_grid=parameters).fit(X_train, Y_train)
 sorted(rf_clf.cv_results_.keys())
 print("The optimal parameters for random forest classifier are: ")
-print(rf_clf.best_params)
+print(rf_clf.best_params_)
 
 # test  C parameters for logistic regression
 C_params = [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000]
@@ -144,7 +148,7 @@ def rf_feature_selection(thresholds):
         model = model.fit(train_features, Y_train)
         model_pred = model.predict(test_features)
         score = jaccard_similarity_score(model_pred, Y_test)
-        print("RF CV score after FEATURE SELECTION: {:5f}".format(score))
+        print("RF accuracy after FEATURE SELECTION: {:5f}".format(score))
         n_features_rf.append(test_features.shape[1])
         accuracy_rf.append(score)
 
@@ -173,7 +177,7 @@ def logit_feature_selection(C_params):
         model = model.fit(train_features, Y_train)
         model_pred = model.predict(test_features)
         score = jaccard_similarity_score(model_pred, Y_test)
-        print("Logistic regression score after FEATURE SELECTION: {:5f}".format(score))
+        print("Logistic regression accuracy after FEATURE SELECTION: {:5f}".format(score))
         n_features_logit.append(test_features.shape[1])
         accuracy_logit.append(score)
 
@@ -200,13 +204,3 @@ plt.plot(n_features_logit, accuracy_logit, 's-', color='red')
 plt.legend(['SVM', 'Random Forest', 'Logistic Regression'], loc=5)
 plt.axis([0, 200, 0.5, 1])
 plt.savefig('images/feature_selection_performance.png', dpi=600)
-
-
-########################################################################################
-#                   test accuracy after feature selection
-########################################################################################
-sgd_clf = joblib.load('models/sgd_clf.pkl')
-svm_clf = joblib.load('models/svm_clf.pkl')
-rf_clf = joblib.load('models/rf_clf.pkl')
-nn_clf = joblib.load('models/nn_clf.pkl')
-print("Models loaded")

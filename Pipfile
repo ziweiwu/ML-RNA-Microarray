@@ -12,6 +12,8 @@ scikit-learn = "*"
 scipy = "*"
 jupyter = "*"
 pylint = "*"
+"pyqt5" = "*"
+sip = "*"
 
 [dev-packages]
 
