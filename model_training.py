@@ -3,12 +3,11 @@ import time
 import json
 import pandas as pd
 import numpy as np
-from sklearn import svm, ensemble
+from sklearn import svm, ensemble, linear_model
 from sklearn.model_selection import GridSearchCV, cross_val_score
 from sklearn.neural_network import MLPClassifier
 from sklearn.externals import joblib
 from sklearn.metrics import recall_score
-from math import sqrt
 
 # load the training data
 print("Loading data sets...")
@@ -31,6 +30,7 @@ f.close()
 print("Dataset loaded.")
 
 # define the models
+logit = linear_model.logistic_regression_path(random_state=100, dual=False)
 linear_svm = svm.LinearSVC(random_state=100, dual=False)
 none_linear_svm = svm.SVC(random_state=100)
 rf = ensemble.RandomForestClassifier(random_state=100)
@@ -50,6 +50,7 @@ def model_recall_test(model, model_name):
 
 
 print("Model         Training time     Recall score")
+model_recall_test(logit, "Logistic regression ")
 model_recall_test(linear_svm, "Linear svm")
 model_recall_test(none_linear_svm, "None-linear svm")
 model_recall_test(rf, "Random forest")
@@ -70,6 +71,11 @@ def model_tune_params(model, params):
         print(new_model, '\n')
         return new_model
 
+
+logit_params = {
+    'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000],
+    'penalty': ('l2', 'l1')
+}
 
 linear_svm_params = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000],
@@ -97,6 +103,7 @@ nn_params = {
     'activation': ('relu', 'tanh', 'identity'),
 }
 
+logit = model_tune_params(logit, logit_params)
 linear_svm = model_tune_params(linear_svm, linear_svm_params)
 none_linear_svm = model_tune_params(none_linear_svm, none_linear_svm_params)
 rf = model_tune_params(rf, rf_params)
@@ -109,8 +116,10 @@ nn = model_tune_params(nn, nn_params)
 # save the models
 if not os.path.exists("models"):
     os.makedirs("models")
-joblib.dump(linear_svm, "models/linear_svm.pkl")
-joblib.dump(none_linear_svm, "models/none_linear_svm.pkl")
-joblib.dump(rf, "models/rf.pkl")
-joblib.dump(nn, "models/nn.pkl")
+
+joblib.dump(logit, "models/logit.pkl", compress=3)
+joblib.dump(linear_svm, "models/linear_svm.pkl", compress=3)
+joblib.dump(none_linear_svm, "models/none_linear_svm.pkl", compress=3)
+joblib.dump(rf, "models/rf.pkl", compress=3)
+joblib.dump(nn, "models/nn.pkl", compress=3)
 print("Models saved.")

@@ -39,6 +39,7 @@ f.close()
 print("Dataset loaded.")
 
 # load models
+logit = joblib.load('models/logit.pkl')
 linear_svm = joblib.load('models/linear_svm.pkl')
 none_linear_svm = joblib.load('models/none_linear_svm.pkl')
 rf = joblib.load('models/rf.pkl')
@@ -57,6 +58,7 @@ C_params.reverse()
 n_features_svm = []
 recall_svm = []
 
+
 # perform feature selection using sparse svm
 def svm_feature_selection(C_params):
     for C in C_params:
@@ -67,10 +69,10 @@ def svm_feature_selection(C_params):
         print("\nWith C={}".format(C))
         print("Sparse SVM reduced number of features to {}.".format(test_features.shape[1]))
 
-        model = svm.LinearSVC(random_state=100, penalty="l1", C=1, dual=False, tol=1e-4)
+        model = linear_svm
         model = model.fit(train_features, Y_train)
         model_pred = model.predict(test_features)
-        score = recall_score(y_pred=model_pred,y_true=Y_test)
+        score = recall_score(y_pred=model_pred, y_true=Y_test, average="macro")
         print("Linear SVC score after FEATURE SELECTION: {:5f}".format(score))
         n_features_svm.append(test_features.shape[1])
         recall_svm.append(score)
@@ -95,10 +97,10 @@ def rf_feature_selection(thresholds):
         print("\nWith threshold {}".format(threshold))
         print("RF reduced number of features to {}.".format(test_features.shape[1]))
 
-        model = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1, n_estimators=50)
+        model = rf
         model = model.fit(train_features, Y_train)
         model_pred = model.predict(test_features)
-        score = recall_score(y_pred=model_pred,y_true=Y_test)
+        score = recall_score(y_pred=model_pred, y_true=Y_test, average="macro")
         print("RF accuracy after FEATURE SELECTION: {:5f}".format(score))
         n_features_rf.append(test_features.shape[1])
         recall_rf.append(score)
@@ -124,10 +126,10 @@ def logit_feature_selection(C_params):
         print("\nWith C={}".format(C))
         print("Logistic regression reduced number of features to {}.".format(test_features.shape[1]))
 
-        model = linear_model.LogisticRegression(random_state=100, penalty="l1", tol=1e-4)
+        model = logit
         model = model.fit(train_features, Y_train)
         model_pred = model.predict(test_features)
-        score = recall_score(y_pred=model_pred,y_true=Y_test)
+        score = recall_score(y_pred=model_pred, y_true=Y_test, average="macro")
         print("Logistic regression accuracy after FEATURE SELECTION: {:5f}".format(score))
         n_features_logit.append(test_features.shape[1])
         recall_logit.append(score)
