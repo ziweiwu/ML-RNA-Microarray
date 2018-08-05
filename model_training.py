@@ -65,7 +65,7 @@ print("Parameter tuning starts...")
 def model_tune_params(model, params):
     if __name__ == '__main__':
         new_model = GridSearchCV(estimator=model,
-                                 param_grid=params, cv=3, n_jobs=-1,
+                                 param_grid=params, cv=5, n_jobs=-1,
                                  scoring="recall_macro")
         new_model.fit(X_train, Y_train)
         print(new_model, '\n')
@@ -74,7 +74,8 @@ def model_tune_params(model, params):
 
 logit_params = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000],
-    'penalty': ('l2', 'l1')
+    'penalty': ('l2', 'l1'),
+    'solver': ('newton-cg', 'sag', 'saga', 'lbfgs')
 }
 
 linear_svm_params = {
