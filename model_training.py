@@ -1,15 +1,16 @@
+import os
 import time
 import json
 import pandas as pd
 import numpy as np
 from sklearn import svm, ensemble
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, cross_val_score
 from sklearn.neural_network import MLPClassifier
 from sklearn.externals import joblib
 from sklearn.metrics import recall_score
+from math import sqrt
 
 # load the training data
-print("To train models using grid search")
 print("Loading data sets...")
 DATA_PATH = "data/"
 X_train = pd.read_csv("%sX_train.csv" % DATA_PATH).values
@@ -32,7 +33,7 @@ print("Dataset loaded.")
 # define the models
 linear_svm = svm.LinearSVC(random_state=100, dual=False)
 none_linear_svm = svm.SVC(random_state=100)
-rf = ensemble.RandomForestClassifier(random_state=100, n_jobs=-1)
+rf = ensemble.RandomForestClassifier(random_state=100)
 nn = MLPClassifier(random_state=100)
 
 
@@ -44,7 +45,7 @@ def model_recall_test(model, model_name):
     model = model.fit(X_train, Y_train)
     t1 = time.time()
     padding = 16
-    recall = recall_score(y_true=Y_test, y_pred=model.predict(X_test), average="weighted")
+    recall = recall_score(y_true=Y_test, y_pred=model.predict(X_test), average="macro")
     print("{}      {:0.4}      {:0.4}".format(model_name.ljust(padding), (t1 - t0), recall))
 
 
@@ -61,9 +62,13 @@ print("Parameter tuning starts...")
 
 
 def model_tune_params(model, params):
-    new_model = GridSearchCV(estimator=model, param_grid=params, cv=5).fit(X_train, Y_train)
-    print(new_model, '\n')
-    return new_model
+    if __name__ == '__main__':
+        new_model = GridSearchCV(estimator=model,
+                                 param_grid=params, cv=3, n_jobs=-1,
+                                 scoring="recall_macro")
+        new_model.fit(X_train, Y_train)
+        print(new_model, '\n')
+        return new_model
 
 
 linear_svm_params = {
@@ -81,7 +86,7 @@ rf_params = {
     'max_leaf_nodes': [50, 100, 150, 200],
     'min_samples_split': [2, 3, 10],
     'min_samples_leaf': [1, 3, 10],
-    'bootstrap': [True, False],
+    'bootstrap': [True],
     'criterion': ['gini', 'entropy']
 }
 
@@ -100,15 +105,12 @@ nn = model_tune_params(nn, nn_params)
 #################################################################################
 # test the models after parameter tuning
 #################################################################################
-print("Tuned_Model         Training time     Recall score")
-model_recall_test(linear_svm, "Linear svm")
-model_recall_test(none_linear_svm, "None-linear svm")
-model_recall_test(rf, "Random forest")
-model_recall_test(nn, "Neuron network ")
 
 # save the models
-joblib.dump(linear_svm, 'models/linear_svm.pkl', compress=3)
-joblib.dump(none_linear_svm, 'models/none_linear_svm.pkl', compress=3)
-joblib.dump(rf, 'models/rf.pkl', compress=3)
-joblib.dump(nn, 'models/nn.pkl', compress=3)
+if not os.path.exists("models"):
+    os.makedirs("models")
+joblib.dump(linear_svm, "models/linear_svm.pkl")
+joblib.dump(none_linear_svm, "models/none_linear_svm.pkl")
+joblib.dump(rf, "models/rf.pkl")
+joblib.dump(nn, "models/nn.pkl")
 print("Models saved.")
