@@ -30,7 +30,7 @@ f.close()
 print("Dataset loaded.")
 
 # define the models
-logit = linear_model.logistic_regression_path(random_state=100, dual=False)
+logit = linear_model.LogisticRegression(random_state=100, dual=False)
 linear_svm = svm.LinearSVC(random_state=100, dual=False)
 none_linear_svm = svm.SVC(random_state=100)
 rf = ensemble.RandomForestClassifier(random_state=100)
@@ -74,8 +74,7 @@ def model_tune_params(model, params):
 
 logit_params = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000],
-    'penalty': ('l2', 'l1'),
-    'solver': ('newton-cg', 'sag', 'saga', 'lbfgs')
+    'penalty': ('l2', 'l1')
 }
 
 linear_svm_params = {
@@ -97,7 +96,6 @@ rf_params = {
     'criterion': ['gini', 'entropy']
 }
 
-# Neural network
 nn_params = {
     'hidden_layer_sizes': [50, 100, 200, 500],
     'alpha': [0.0001, 0.0005, 0.001, 0.005],
