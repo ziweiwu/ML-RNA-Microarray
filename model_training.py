@@ -111,7 +111,6 @@ nn = model_tune_params(nn, nn_params)
 #################################################################################
 # test the models after parameter tuning
 #################################################################################
-
 # save the models
 if not os.path.exists("models"):
     os.makedirs("models")

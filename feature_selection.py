@@ -13,7 +13,6 @@ from sklearn.feature_selection import SelectFromModel
 from sklearn.metrics import recall_score
 from matplotlib.pyplot import figure
 
-
 ########################################################################################
 #                    Load dataset
 ########################################################################################
@@ -37,13 +36,14 @@ f.close()
 
 print("Dataset loaded.")
 
-# load models
-logit = joblib.load('models/logit.pkl')
-linear_svm = joblib.load('models/linear_svm.pkl')
-none_linear_svm = joblib.load('models/none_linear_svm.pkl')
-rf = joblib.load('models/rf.pkl')
-nn = joblib.load('models/nn.pkl')
-print("Models loaded")
+
+# # load models
+# logit = joblib.load('models/logit.pkl')
+# linear_svm = joblib.load('models/linear_svm.pkl')
+# none_linear_svm = joblib.load('models/none_linear_svm.pkl')
+# rf = joblib.load('models/rf.pkl')
+# nn = joblib.load('models/nn.pkl')
+# print("Models loaded")
 
 
 ########################################################################################
@@ -53,7 +53,7 @@ print("Models loaded")
 def model_tune_params(model, params):
     new_model = GridSearchCV(estimator=model,
                              param_grid=params, cv=5,
-                             scoring="recall_macro")
+                             scoring="recall_macro", n_jobs=-1)
     return new_model
 
 
@@ -84,21 +84,23 @@ C_params.reverse()
 n_features_svm = []
 recall_svm = []
 
+
 # perform feature selection using sparse svm
 def svm_feature_selection(C_params):
     for C in C_params:
-        model_select = svm.LinearSVC(random_state=100, penalty="l1", C=C, dual=False, tol=1e-4)
-        model_select = SelectFromModel(model_select).fit(X_train, Y_train)
-        train_features = model_select.transform(X_train)
-        test_features = model_select.transform(X_test)
+        est = svm.LinearSVC(random_state=100, penalty="l1", C=C, dual=False, tol=1e-4)
+        transformer = SelectFromModel(estimator=est)
+        train_features = transformer.fit_transform(X_train, Y_train)
+        test_features = transformer.transform(X_test)
         print("\nWith C={}".format(C))
         print("Sparse SVM reduced number of features to {}.".format(test_features.shape[1]))
 
         model = svm.LinearSVC(random_state=100, dual=False)
-        if test_features.shape[1] <= 200: model = model_tune_params(model, linear_svm_params)
+        if test_features.shape[1] <= 200:
+            model = model_tune_params(model, linear_svm_params)
         model.fit(train_features, Y_train)
         score = recall_score(y_pred=model.predict(test_features), y_true=Y_test, average="macro")
-        print("Linear SVC score after FEATURE SELECTION: {:5f}".format(score))
+        print("Linear SVC recall after FEATURE SELECTION: {:5f}".format(score))
         n_features_svm.append(test_features.shape[1])
         recall_svm.append(score)
 
@@ -115,18 +117,19 @@ recall_rf = []
 
 def rf_feature_selection(thresholds):
     for threshold in thresholds:
-        model = ensemble.RandomForestClassifier(random_state=100, n_estimators=50)
-        model_select = SelectFromModel(model, threshold=threshold).fit(X_train, Y_train)
-        train_features = model_select.transform(X_train)
-        test_features = model_select.transform(X_test)
+        est = ensemble.RandomForestClassifier(random_state=100, n_estimators=50, n_jobs=-1)
+        transformer = SelectFromModel(estimator=est, threshold=threshold)
+        train_features = transformer.fit_transform(X_train, Y_train)
+        test_features = transformer.transform(X_test)
         print("\nWith threshold {}".format(threshold))
         print("RF reduced number of features to {}.".format(test_features.shape[1]))
 
         model = ensemble.RandomForestClassifier(random_state=100)
-        if test_features.shape[1] <= 200: model = model_tune_params(model, rf_params)
+        if test_features.shape[1] <= 200:
+            model = model_tune_params(model, rf_params)
         model.fit(train_features, Y_train)
         score = recall_score(y_pred=model.predict(test_features), y_true=Y_test, average="macro")
-        print("RF accuracy after FEATURE SELECTION: {:5f}".format(score))
+        print("RF recall after FEATURE SELECTION: {:5f}".format(score))
         n_features_rf.append(test_features.shape[1])
         recall_rf.append(score)
 
@@ -144,18 +147,19 @@ recall_logit = []
 
 def logit_feature_selection(C_params):
     for C in C_params:
-        model = linear_model.LogisticRegression(random_state=100, penalty="l1", C=C, tol=1e-4)
-        model_select = SelectFromModel(model).fit(X_train, Y_train)
-        train_features = model_select.transform(X_train)
-        test_features = model_select.transform(X_test)
+        est = linear_model.LogisticRegression(random_state=100, penalty="l1", C=C, tol=1e-4)
+        transformer = SelectFromModel(estimator=est)
+        train_features = transformer.fit_transform(X_train, Y_train)
+        test_features = transformer.transform(X_test)
         print("\nWith C={}".format(C))
         print("Logistic regression reduced number of features to {}.".format(test_features.shape[1]))
 
         model = linear_model.LogisticRegression(random_state=100)
-        if test_features.shape[1] <= 200: model = model_tune_params(model, logit_params)
+        if test_features.shape[1] <= 200:
+            model = model_tune_params(model, logit_params)
         model.fit(train_features, Y_train)
         score = recall_score(y_pred=model.predict(test_features), y_true=Y_test, average="macro")
-        print("Logistic regression accuracy after FEATURE SELECTION: {:5f}".format(score))
+        print("Logistic regression recall after FEATURE SELECTION: {:5f}".format(score))
         n_features_logit.append(test_features.shape[1])
         recall_logit.append(score)
 
@@ -172,11 +176,11 @@ print(recall_rf)
 print(n_features_logit)
 print(recall_logit)
 
-figure(num=None, figsize=(6, 8), dpi=800, facecolor='w', edgecolor='k')
+figure(num=None, figsize=(8, 8), dpi=800, facecolor='w', edgecolor='k')
 plt.xlabel('Number of Features')
 plt.ylabel('Recall')
 plt.title("Number of Features vs. Recall")
-plt.plot(n_features_svm, recall_svm, 'o-')
+plt.plot(n_features_svm, recall_svm, 'o-', color='blue')
 plt.plot(n_features_rf, recall_rf, '^-', color='green')
 plt.plot(n_features_logit, recall_logit, 's-', color='red')
 plt.legend(['SVM', 'Random Forest', 'Logistic Regression'], loc=5)
