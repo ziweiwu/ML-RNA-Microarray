@@ -17,6 +17,10 @@ print(X.dtypes)
 print(Y.head())
 print(Y.dtypes)
 
+# count the frequency of each class
+class_count = Y['Class'].value_counts().to_dict()
+print(class_count)
+
 # convert dataframe into a numpy array
 X = X.dropna()
 # drop the first column which only contains strings
@@ -33,7 +37,7 @@ Y = Y.apply(le.fit_transform)
 Y_data = Y.values.flatten()
 
 # save class names to a txt file
-f = open('%sclass_names.txt'%DATA_PATH, 'w')
+f = open('%sclass_names.txt' % DATA_PATH, 'w')
 json.dump(class_names, f)
 f.close()
 
