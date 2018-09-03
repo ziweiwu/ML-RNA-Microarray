@@ -41,21 +41,25 @@ f = open('%sclass_names.txt' % DATA_PATH, 'w')
 json.dump(class_names, f)
 f.close()
 
-# use TSNE to visualize the high dimension data in 2D
-t0 = time.time()
-tsne = TSNE(n_components=2, verbose=1, perplexity=40, n_iter=300, random_state=100)
-tsne_results = tsne.fit_transform(X)
-t1 = time.time()
-print("TSNE took at %.2f seconds" % (t1 - t0))
 
-# visualize TSNE and save the plot
-x_axis = tsne_results[:, 0]
-y_axis = tsne_results[:, 1]
-plt.scatter(x_axis, y_axis, c=Y_data, cmap=plt.cm.get_cmap("jet", 100))
-plt.colorbar(ticks=range(10))
-plt.clim(-0.5, 9.5)
-plt.title("TSNE Visualization")
-plt.savefig("./images/tsne_graph.png", dpi=600)
+# use TSNE to visualize the high dimension data in 2D
+def tsne_visulization():
+    t0 = time.time()
+    tsne = TSNE(n_components=2, verbose=1, perplexity=40, n_iter=300, random_state=100)
+    tsne_results = tsne.fit_transform(X)
+    t1 = time.time()
+    print("TSNE took at %.2f seconds" % (t1 - t0))
+    # visualize TSNE and save the plot
+    x_axis = tsne_results[:, 0]
+    y_axis = tsne_results[:, 1]
+    plt.scatter(x_axis, y_axis, c=Y_data, cmap=plt.cm.get_cmap("jet", 100))
+    plt.colorbar(ticks=range(10))
+    plt.clim(-0.5, 9.5)
+    plt.title("TSNE Visualization")
+    plt.savefig("./images/tsne_graph.png", dpi=600)
+
+
+tsne_visulization()
 
 # split data into training and testing set
 X_train, X_test, Y_train, Y_test \
