@@ -69,12 +69,10 @@ Knowing when to stop refining the model, and put it into production.
 - Parameter tuning using random search or grid search
 - Select and test the models 
 
-### TODO 
-
+### Feature Selection
 - Goal: find the most important ten genes associated with each cancer type
 - Methods
   1. use SVM to select out the most important feature iteratively, to generate sparsity
   2. use RF to find the most important feature 
 - visualization 
   - create a model performance visualization as a function of increasing sparsity 
-  - create a table of the most important genes with each type of cancers

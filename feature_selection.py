@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib
 
 # https://markhneedham.com/blog/2018/05/04/python-runtime-error-osx-matplotlib-not-installed-as-framework-mac/
-matplotlib.use('TkAgg')  # to solve the issue of reporting python is not used as framework,
+matplotlib.use('Agg')  # to solve the issue of reporting python is not used as framework,
 import matplotlib.pyplot as plt
 from sklearn.externals import joblib
 from sklearn import svm, ensemble, linear_model
@@ -176,7 +176,7 @@ print(recall_rf)
 print(n_features_logit)
 print(recall_logit)
 
-figure(num=None, figsize=(8, 8), dpi=800, facecolor='w', edgecolor='k')
+figure(num=None, figsize=(8, 8), dpi=600, facecolor='w', edgecolor='k')
 plt.xlabel('Number of Features')
 plt.ylabel('Recall')
 plt.title("Number of Features vs. Recall")
